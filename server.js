@@ -2,10 +2,20 @@ const express = require("express");
 const path = require('path'); //a node native module
 const {Item, Menu} = require('./models/index');
 const {Restaurant} = require('./models/Restaurant');
+const Handlebars = require('handlebars')
+const expressHandlebars = require('express-handlebars')
+const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 const app = express();
 const port = 3000;
 
+// setup our templating engine
+const handlebars = expressHandlebars({
+    handlebars: allowInsecurePrototypeAccess(Handlebars)
+})
+
+app.engine('handlebars', handlebars)
+app.set('view engine', 'handlebars')
 //Q: What does express.static help us do?
 //Q: What do you think path.join helps us do?
 app.use(express.static(path.join(__dirname, 'public')))
@@ -66,8 +76,13 @@ app.put('/restaurants/:id', (req, res) => {
     res.send(req.body)
 })
 
-app.delete('/restaurants/:id', () => {
+app.delete('/restaurants/:id', (req, res) => {
     Restaurant.destroy({where: req.params.id})
+})
+
+app.get('web/restaurants/', async (req, res) => {
+    const restaurants = await Restaurant.findAll();
+    res.render('restaurants', {restaurants});
 })
 
 //Q: What will our server be doing?
