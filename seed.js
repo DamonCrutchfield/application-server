@@ -5,7 +5,6 @@ const {Restaurant, Menu, Item} = require('./models/index') //Q: WHY import these
 //Q: What do you think will happen when we 'seed' this file?
 const seedRestaurant = [
   {
-    id: 1,
     name: 'AppleBees',
     location: 'Texas',
     cuisine: 'FastFood'

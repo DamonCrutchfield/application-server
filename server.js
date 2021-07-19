@@ -16,6 +16,7 @@ const handlebars = expressHandlebars({
 
 app.engine('handlebars', handlebars)
 app.set('view engine', 'handlebars')
+
 //Q: What does express.static help us do?
 //Q: What do you think path.join helps us do?
 app.use(express.static(path.join(__dirname, 'public')))
@@ -73,15 +74,21 @@ app.post('/restaurants', async (req, res) => {
 
 app.put('/restaurants/:id', (req, res) => {
     Restaurant.update({name: req.body.name}, {where: req.params.id})
-    res.send(req.body)
+    res.send(req.body);
 })
 
-app.delete('/restaurants/:id', (req, res) => {
-    Restaurant.destroy({where: req.params.id})
+app.delete('/restaurants/:id', async (req, res) => {
+    await Restaurant.destroy({where: { id: req.params.id }})
+    res.json(req.body)
 })
 
-app.get('web/restaurants/', async (req, res) => {
+app.get('/web/restaurants/', async (req, res) => {
     const restaurants = await Restaurant.findAll();
+    res.render('restaurants', {restaurants});
+})
+
+app.get('/web/restaurants/:id', async (req, res) => {
+    const restaurants = await Restaurant.findAll({where: {id: req.params.id}});
     res.render('restaurants', {restaurants});
 })
 
